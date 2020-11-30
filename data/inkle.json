@@ -12,7 +12,9 @@
 
 									{"option":"Option 1","linkPath":"youChoseOptionJu","ifConditions":null,"notIfConditions":null},
 
-									{"option":"Option 2","linkPath":"youreARebelPicki","ifConditions":null,"notIfConditions":null},{"pageNum":1}
+									{"option":"Option 2","linkPath":"youreARebelPicki","ifConditions":null,"notIfConditions":null},
+
+									{"pageNum":1}
 								]
 						},
 				
@@ -22,7 +24,9 @@
 									[
 										"You chose option 1; just testing things out.",
 
-										{"option":"Let's join back up","linkPath":"annnnnndWereBack","ifConditions":null,"notIfConditions":null}, {"flagName":"option1"}
+										{"option":"Let's join back up","linkPath":"annnnnndWereBack","ifConditions":null,"notIfConditions":null},
+
+										{"flagName":"option1"}
 									]
 							},
 

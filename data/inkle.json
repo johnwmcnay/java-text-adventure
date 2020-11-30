@@ -1,0 +1,63 @@
+{
+	"title":"Test",
+	"data":
+		{
+			"stitches": 
+				{
+					"onceUponATime":
+						{
+							"content":
+								[
+									"Once upon a time...",
+
+									{"option":"Option 1","linkPath":"youChoseOptionJu","ifConditions":null,"notIfConditions":null},
+
+									{"option":"Option 2","linkPath":"youreARebelPicki","ifConditions":null,"notIfConditions":null},{"pageNum":1}
+								]
+						},
+				
+						"youChoseOptionJu":
+							{
+								"content":
+									[
+										"You chose option 1; just testing things out.",
+
+										{"option":"Let's join back up","linkPath":"annnnnndWereBack","ifConditions":null,"notIfConditions":null}, {"flagName":"option1"}
+									]
+							},
+
+						"youreARebelPicki":
+							{
+								"content":
+									[
+										"You're a rebel picking option 2. Let's meet back up.",
+
+										{"option":"Get back to it","linkPath":"annnnnndWereBack",
+										"ifConditions":null, "notIfConditions":null},{"flagName":"option2"}
+									]
+							},
+
+						"annnnnndWereBack":
+
+							{
+								"content":
+									[
+										"Annnnnnd we're back!",
+
+										{"option":"This is available if you picked option 1","linkPath":"theFirstEnding","ifConditions":[{"ifCondition":"option1"}],"notIfConditions":null},
+										{"option":"This is available only if picked the second option","linkPath":"theSecondEnding","ifConditions":[{"ifCondition":"option2"}],"notIfConditions":null},{"pageNum":2}
+									]
+							}
+
+						,"theFirstEnding":{"content":["The first ending."]},
+						"theSecondEnding":{"content":["The second ending."]},
+				},
+
+			"initial":"onceUponATime",
+			"optionMirroring":true,
+			"allowCheckpoints":false,
+			"editorData": {"playPoint":"annnnnndWereBack","libraryVisible":true,"authorName":"Anonymous","textSize":0}
+		},
+
+	"url_key":35327
+}

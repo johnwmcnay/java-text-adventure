@@ -17,26 +17,13 @@ public class Main {
         Inkle inkle = new Inkle(JSON_FILE);
 
         System.out.println("inkle.getTitle() = " + inkle.getTitle());
-        //        JSONParser parser = new JSONParser();
-
         System.out.println("inkle.getMap() = " + inkle.getMap());
         System.out.println("inkle.getData() = " + inkle.getData());
         System.out.println("inkle.getStitches() = " + inkle.getStitches());
         System.out.println("inkle.getInitial() = " + inkle.getInitial());
 
-//        FileReader reader = new FileReader("data/inkle.json");
-//
-//        Object obj = parser.parse(reader);
-//        HashMap<?,?> map = (HashMap<?, ?>) obj;
-//        HashMap<?,?> data = (HashMap<?, ?>) map.get("data");
-//        HashMap<?,?> stitches = (HashMap<?, ?>) data.get("stitches");
-//        HashMap<?,?> start = (HashMap<?, ?>) stitches.get(data.get("initial"));
+        inkle.start();
 //        List<?> current = (List<?>) start.get("content");
-//
-
-
-//        System.out.println("map = " + map);
-//        System.out.println("current = " + current);
 //
 //        List<String> options = display(current);
 //

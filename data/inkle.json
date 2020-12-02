@@ -109,6 +109,9 @@
             "ifConditions": [
               {
                 "ifCondition": "option1"
+              },
+              {
+                "ifCondition": "int_a = 5"
               }
             ],
             "notIfConditions": null

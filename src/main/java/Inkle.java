@@ -67,12 +67,10 @@ public class Inkle {
             displayParagraphs();
             displayOptions();
 
-            System.out.print("\n>> ");
+            System.out.print(">> ");
             choice = sc.nextInt() - 1;
-            setContent(options.get(choice).getLinkPath());
-
+            setContent(this.options.get(choice).getLinkPath());
         }
-
     }
 
     private void setFlags() {
@@ -95,7 +93,6 @@ public class Inkle {
                 break;
             }
         }
-        System.out.println("this.flags.toString() = " + this.flags.toString());
     }
 
     private void displayParagraphs() {
@@ -105,16 +102,49 @@ public class Inkle {
     }
 
     private void displayOptions() {
+        JSONParser parser = new JSONParser();
+        this.options = new ArrayList<>();
+        List<HashMap<String, String>> obj = new ArrayList<>();
         int num = 1;
 
         for (Option option : getOptions()) {
-            System.out.println(num + ": " + option.getOption());
-            num++;
+            String ifConditions = option.getIfConditions();
+            String ifNotConditions = option.getIfNotConditions();
+            System.out.println("ifConditions = " + ifConditions);
+            System.out.println("ifNotConditions = " + ifNotConditions);
+
+            try {
+                if (ifConditions != null) {
+                    obj = (List<HashMap<String, String>>) parser.parse(ifConditions);
+
+                    for (HashMap<String, String> map : obj) {
+                        System.out.println("map.get(\"ifCondition\") = " + map.get("ifCondition"));
+
+                    }
+
+                }
+                if (ifNotConditions != null) {
+                    System.out.println("parser.parse = " + parser.parse(ifNotConditions));
+                }
+
+
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+            //TODO: add conditionals for options
+            if (ifConditions == null && ifNotConditions == null) {
+
+                System.out.println(num + ": " + option.getOption());
+                this.options.add(option);
+                num++;
+            }
+
         }
     }
 
     private List<Option> getOptions() {
-        this.options = new ArrayList<>();
+        List<Option> options = new ArrayList<>();
 
         for (short i = 1; i < this.currentContent.size(); i++) {
             HashMap<?, ?> obj = (HashMap<?, ?>) this.currentContent.get(i);
@@ -125,8 +155,8 @@ public class Inkle {
                 options.add(new Option(
                         obj.get("option").toString(),
                         obj.get("linkPath").toString(),
-                        obj.get("ifConditions") == null ? "": obj.get("ifConditions").toString(),
-                        obj.get("notIfConditions") == null ? "": obj.get("notIfConditions").toString())
+                        obj.get("ifConditions") == null ? null : obj.get("ifConditions").toString(),
+                        obj.get("notIfConditions") == null ? null : obj.get("notIfConditions").toString())
                 );
             }
         }
@@ -147,7 +177,7 @@ public class Inkle {
 
         String paragraph = (String) this.currentContent.get(0);
 
-        if (checkParagraphConditions()){
+        if (checkParagraphConditions()) {
             System.out.println(paragraph);
         }
 
@@ -156,34 +186,46 @@ public class Inkle {
 
     private boolean checkParagraphConditions() {
         for (int i = 2; i < this.currentContent.size(); i++) {
-            HashMap <?, ?> condition = (HashMap<?, ?>) this.currentContent.get(i);
+            HashMap<?, ?> condition = (HashMap<?, ?>) this.currentContent.get(i);
 
             if (condition.get("ifCondition") != null) {
 
-                String str = (String) condition.get("ifCondition");
-                String[] strArray = str.split("=");
-                String key = strArray[0].trim();
-                String value = strArray.length > 1 ? strArray[1].trim() : null;
-                
-                if (!this.flags.containsKey(key)) {
-                    return false;
-                } else if (value != null && !this.flags.get(key).equals(value)) {
+                if (!checkIfCondition(condition)) {
                     return false;
                 }
 
             } else if (condition.get("notIfCondition") != null) {
 
-                String str = (String) condition.get("notIfCondition");
-                String[] strArray = str.split("=");
-                String key = strArray[0].trim();
-                String value = strArray.length > 1 ? strArray[1].trim() : null;
-
-                if (this.flags.containsKey(key) && this.flags.get(key).equals(value)) {
+                if (!checkIfNotCondition(condition)) {
                     return false;
                 }
             }
+
         }
         return true;
+    }
+
+    public boolean checkIfNotCondition(HashMap<?, ?> condition) {
+
+        String str = (String) condition.get("notIfCondition");
+        String[] strArray = str.split("=");
+        String key = strArray[0].trim();
+        String value = strArray.length > 1 ? strArray[1].trim() : null;
+
+        return !this.flags.containsKey(key) || !this.flags.get(key).equals(value);
+    }
+
+    public boolean checkIfCondition(HashMap<?, ?> condition) {
+
+        String str = (String) condition.get("ifCondition");
+        String[] strArray = str.split("=");
+        String key = strArray[0].trim();
+        String value = strArray.length > 1 ? strArray[1].trim() : null;
+
+        if (!this.flags.containsKey(key)) {
+            return false;
+        }
+        return value == null || this.flags.get(key).equals(value);
     }
 
     public List<?> getContent() {

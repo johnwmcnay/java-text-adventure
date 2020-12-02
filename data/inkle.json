@@ -114,7 +114,11 @@
                 "ifCondition": "int_a = 5"
               }
             ],
-            "notIfConditions": null
+            "notIfConditions": [
+              {
+                "notIfCondition": "option2"
+              }
+            ]
           },
           {
             "option": "This is available only if picked the second option",

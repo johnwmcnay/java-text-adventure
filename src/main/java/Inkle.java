@@ -73,6 +73,7 @@ public class Inkle {
         }
     }
 
+    //TODO: allow arithmetic on flags
     private void setFlags() {
 
         for (int i = this.currentContent.size() - 1; i > 0; i--) {
@@ -102,45 +103,57 @@ public class Inkle {
     }
 
     private void displayOptions() {
-        JSONParser parser = new JSONParser();
+
         this.options = new ArrayList<>();
-        List<HashMap<String, String>> obj = new ArrayList<>();
+
         int num = 1;
 
         for (Option option : getOptions()) {
-            String ifConditions = option.getIfConditions();
-            String ifNotConditions = option.getIfNotConditions();
-            System.out.println("ifConditions = " + ifConditions);
-            System.out.println("ifNotConditions = " + ifNotConditions);
-
-            try {
-                if (ifConditions != null) {
-                    obj = (List<HashMap<String, String>>) parser.parse(ifConditions);
-
-                    for (HashMap<String, String> map : obj) {
-                        System.out.println("map.get(\"ifCondition\") = " + map.get("ifCondition"));
-
-                    }
-
-                }
-                if (ifNotConditions != null) {
-                    System.out.println("parser.parse = " + parser.parse(ifNotConditions));
-                }
-
-
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-
-            //TODO: add conditionals for options
-            if (ifConditions == null && ifNotConditions == null) {
-
+            if (checkOption(option)) {
                 System.out.println(num + ": " + option.getOption());
                 this.options.add(option);
                 num++;
             }
-
         }
+    }
+
+    private boolean checkOption(Option option) {
+        JSONParser parser = new JSONParser();
+        List<?> conditions;
+        String ifConditions = option.getIfConditions();
+        String ifNotConditions = option.getIfNotConditions();
+
+        try {
+            if (ifConditions != null) {
+                conditions = (List<?>) parser.parse(ifConditions);
+
+                for (Object condition : conditions) {
+
+                    HashMap <?, ?> map = (HashMap <?, ?>) condition;
+
+                    if (!checkIfCondition(map)) {
+                        return false;
+                    }
+                }
+            }
+
+            if (ifNotConditions != null) {
+                conditions = (List<?>) parser.parse(ifNotConditions);
+
+                for (Object condition : conditions) {
+
+                    HashMap <?, ?> map = (HashMap <?, ?>) condition;
+
+                    if (!checkIfNotCondition(map)) {
+                        return false;
+                    }
+                }
+            }
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return true;
     }
 
     private List<Option> getOptions() {

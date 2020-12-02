@@ -4,14 +4,11 @@ import org.json.simple.parser.ParseException;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class Inkle {
 
-    private final HashMap<String, String> flags = new HashMap<>();
+    private HashMap<String, String> flags = new HashMap<>();
     private final String title;
     private final String initial;
     private HashMap<?, ?> map = new HashMap<>();
@@ -23,7 +20,31 @@ public class Inkle {
 
     public Inkle(String fileName) {
 
+        FileReader reader = loadFile(fileName);
+
+        this.map = parseFileContents(reader);
+        this.title = (String) this.map.get("title");
+        this.data = (HashMap<?, ?>) this.map.get("data");
+        this.stitches = (HashMap<?, ?>) this.data.get("stitches");
+        this.initial = (String) this.data.get("initial");
+        this.currentContent = getContent();
+    }
+
+    private HashMap<?, ?> parseFileContents(FileReader reader) {
+
         JSONParser parser = new JSONParser();
+        HashMap<?, ?> map = null;
+
+        try {
+            map = (HashMap<?, ?>) parser.parse(reader);
+        } catch (ParseException | IOException e) {
+            System.err.println("Error parsing contents into JSON");
+            e.printStackTrace();
+        }
+        return map;
+    }
+
+    private FileReader loadFile(String fileName) {
         FileReader reader = null;
 
         try {
@@ -32,19 +53,7 @@ public class Inkle {
             System.err.println("Error loading file'" + fileName + "' into FileReader: file may not exist or path is wrong");
             e.printStackTrace();
         }
-
-        try {
-            this.map = (HashMap<?, ?>) parser.parse(reader);
-        } catch (ParseException | IOException e) {
-            System.err.println("Error parsing contents of '" + fileName + "' into JSON");
-            e.printStackTrace();
-        }
-
-        this.title = (String) this.map.get("title");
-        this.data = (HashMap<?, ?>) this.map.get("data");
-        this.stitches = (HashMap<?, ?>) this.data.get("stitches");
-        this.initial = (String) this.data.get("initial");
-        this.currentContent = getContent();
+        return reader;
     }
 
     public void start() {
@@ -54,9 +63,9 @@ public class Inkle {
 
         while (choice != -1) {
 
+            setFlags();
             displayParagraphs();
             displayOptions();
-            setFlags();
 
             System.out.print("\n>> ");
             choice = sc.nextInt() - 1;
@@ -86,6 +95,7 @@ public class Inkle {
                 break;
             }
         }
+        System.out.println("this.flags.toString() = " + this.flags.toString());
     }
 
     private void displayParagraphs() {
@@ -134,10 +144,46 @@ public class Inkle {
     }
 
     private String displayParagraph() {
+
         String paragraph = (String) this.currentContent.get(0);
-        //TODO: add conditionals
-        System.out.println(paragraph);
+
+        if (checkParagraphConditions()){
+            System.out.println(paragraph);
+        }
+
         return getDivert();
+    }
+
+    private boolean checkParagraphConditions() {
+        for (int i = 2; i < this.currentContent.size(); i++) {
+            HashMap <?, ?> condition = (HashMap<?, ?>) this.currentContent.get(i);
+
+            if (condition.get("ifCondition") != null) {
+
+                String str = (String) condition.get("ifCondition");
+                String[] strArray = str.split("=");
+                String key = strArray[0].trim();
+                String value = strArray.length > 1 ? strArray[1].trim() : null;
+                
+                if (!this.flags.containsKey(key)) {
+                    return false;
+                } else if (value != null && !this.flags.get(key).equals(value)) {
+                    return false;
+                }
+
+            } else if (condition.get("notIfCondition") != null) {
+
+                String str = (String) condition.get("notIfCondition");
+                String[] strArray = str.split("=");
+                String key = strArray[0].trim();
+                String value = strArray.length > 1 ? strArray[1].trim() : null;
+
+                if (this.flags.containsKey(key) && this.flags.get(key).equals(value)) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public List<?> getContent() {

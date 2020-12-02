@@ -15,7 +15,7 @@
       },
       "thereWasASecondP": {
         "content": [
-          "There was a second paragraph",
+          "There was a second paragraph {~clear|cloudy|dark|very far away}",
           {
             "option": "Option 1",
             "linkPath": "youChoseOptionJu",
@@ -71,9 +71,6 @@
             "divert": "blahBlahBlah"
           },
           {
-            "flagName": "test + 1"
-          },
-          {
             "pageNum": 2
           }
         ]
@@ -91,6 +88,15 @@
           "yup",
           {
             "divert": "blahBlahBlah1"
+          },
+          {
+            "ifCondition": "test = 5"
+          },
+          {
+            "ifCondition": "option1"
+          },
+          {
+            "notIfCondition": "option2"
           }
         ]
       },
@@ -134,7 +140,7 @@
     "optionMirroring": true,
     "allowCheckpoints": false,
     "editorData": {
-      "playPoint": "thereWasASecondP",
+      "playPoint": "blahBlahBlah1",
       "libraryVisible": false,
       "authorName": "Anonymous",
       "textSize": 0

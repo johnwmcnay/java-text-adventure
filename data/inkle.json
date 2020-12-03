@@ -85,7 +85,7 @@
       },
       "yup": {
         "content": [
-          "yup",
+          "yup [number:test]",
           {
             "divert": "blahBlahBlah1"
           },

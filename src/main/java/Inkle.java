@@ -65,8 +65,8 @@ public class Inkle {
 
         while (choice != -1) {
 
-            setFlags();
             displayParagraphs();
+            setFlags();
             displayOptions();
 
             System.out.print(">> ");
@@ -75,13 +75,23 @@ public class Inkle {
         }
     }
 
-    //TODO: Parse all text to handle flag values etc.
+    //TODO: Parse text for any additional functionality discovered
     public void inkleOut(String output) {
 
         while (output.contains("{~")) {
             String piece = StringUtils.substringBetween(output, "{~", "}");
             String[] strArray = piece.split("\\|");
             output = output.replace("{~" + piece + "}", strArray[RandomUtils.nextInt(0, strArray.length)]);
+        }
+
+        while (output.contains("[value:")) {
+            String piece = StringUtils.substringBetween(output, "[value:", "]");
+            output = output.replace("[value:" + piece + "]", this.flags.get(piece));
+        }
+
+        while (output.contains("[number:")) {
+            String piece = StringUtils.substringBetween(output, "[number:", "]");
+            output = output.replace("[number:" + piece + "]", this.flags.get(piece));
         }
 
         System.out.println(output);

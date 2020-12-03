@@ -8,6 +8,7 @@ import java.util.*;
 
 public class Inkle {
 
+    private static final String PARSE_ERROR = "Error parsing contents into JSON";
     private HashMap<String, String> flags = new HashMap<>();
     private final String title;
     private final String initial;
@@ -17,7 +18,7 @@ public class Inkle {
     private List<?> currentContent;
     private List<Option> options = new ArrayList<>();
 
-
+    //TODO: Parse all text to handle randomization and flag values
     public Inkle(String fileName) {
 
         FileReader reader = loadFile(fileName);
@@ -38,7 +39,7 @@ public class Inkle {
         try {
             map = (HashMap<?, ?>) parser.parse(reader);
         } catch (ParseException | IOException e) {
-            System.err.println("Error parsing contents into JSON");
+            System.err.println(PARSE_ERROR);
             e.printStackTrace();
         }
         return map;
@@ -73,11 +74,14 @@ public class Inkle {
         }
     }
 
-    //TODO: allow arithmetic on flags
+    //The following are acceptable markers:
+    //str  ||  str = int  ||  str + int  ||  str - int
+    //TODO: add advanced syntax for other arithmetic
     private void setFlags() {
 
         for (int i = this.currentContent.size() - 1; i > 0; i--) {
             HashMap<?, ?> obj = (HashMap<?, ?>) this.currentContent.get(i);
+            System.out.println("obj.toString() = " + obj.toString());
             if (obj.get("flagName") != null) {
 
                 String str = (String) obj.get("flagName");
@@ -85,15 +89,33 @@ public class Inkle {
 
                 String key = strArray[0].trim();
                 String value = null;
-                if (strArray.length > 1) {
+
+                if (key.contains("+")) {
+
+                    strArray = strArray[0].split("\\+");
+                    key = strArray[0].trim();
+                    value = Integer.toString(
+                            (Integer.parseInt(getFlagValue(key) + strArray[1].trim()))
+                    );
+
+                } else if (key.contains("-")) {
+
+                    strArray = strArray[0].split("-");
+                    key = strArray[0].trim();
+                    value = Integer.toString(getFlagValue(key) - Integer.parseInt(strArray[1].trim()));
+
+                } else if (strArray.length > 1) {
                     value = strArray[1].trim();
                 }
 
                 this.flags.put(key, value);
-            } else {
-                break;
             }
         }
+        System.out.println("this.flags.toString() = " + this.flags.toString());
+    }
+
+    public int getFlagValue(String key) {
+        return (this.flags.get(key) == null ? 0 : Integer.parseInt(this.flags.get(key)));
     }
 
     private void displayParagraphs() {
@@ -119,40 +141,51 @@ public class Inkle {
 
     private boolean checkOption(Option option) {
         JSONParser parser = new JSONParser();
-        List<?> conditions;
+        List<?> conditions = null;
         String ifConditions = option.getIfConditions();
         String ifNotConditions = option.getIfNotConditions();
 
-        try {
-            if (ifConditions != null) {
-                conditions = (List<?>) parser.parse(ifConditions);
+        if (ifConditions != null) {
 
+            try {
+                conditions = (List<?>) parser.parse(ifConditions);
+            } catch (ParseException e) {
+                System.err.println(PARSE_ERROR);
+                e.printStackTrace();
+            }
+
+            if (conditions != null) {
                 for (Object condition : conditions) {
 
-                    HashMap <?, ?> map = (HashMap <?, ?>) condition;
+                    HashMap<?, ?> map = (HashMap<?, ?>) condition;
 
                     if (!checkIfCondition(map)) {
                         return false;
                     }
                 }
             }
+        }
 
-            if (ifNotConditions != null) {
+        if (ifNotConditions != null) {
+            try {
                 conditions = (List<?>) parser.parse(ifNotConditions);
+            } catch (ParseException e) {
+                System.err.println(PARSE_ERROR);
+                e.printStackTrace();
+            }
 
+            if (conditions != null) {
                 for (Object condition : conditions) {
 
-                    HashMap <?, ?> map = (HashMap <?, ?>) condition;
+                    HashMap<?, ?> map = (HashMap<?, ?>) condition;
 
                     if (!checkIfNotCondition(map)) {
                         return false;
                     }
                 }
             }
-
-        } catch (ParseException e) {
-            e.printStackTrace();
         }
+
         return true;
     }
 
@@ -218,6 +251,7 @@ public class Inkle {
         return true;
     }
 
+    //TODO: handle inequalities
     public boolean checkIfNotCondition(HashMap<?, ?> condition) {
 
         String str = (String) condition.get("notIfCondition");
@@ -228,6 +262,7 @@ public class Inkle {
         return !this.flags.containsKey(key) || !this.flags.get(key).equals(value);
     }
 
+    //TODO: handle inequalities
     public boolean checkIfCondition(HashMap<?, ?> condition) {
 
         String str = (String) condition.get("ifCondition");

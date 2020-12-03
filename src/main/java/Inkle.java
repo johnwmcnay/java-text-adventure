@@ -1,3 +1,5 @@
+import org.apache.commons.lang3.RandomUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -18,7 +20,6 @@ public class Inkle {
     private List<?> currentContent;
     private List<Option> options = new ArrayList<>();
 
-    //TODO: Parse all text to handle randomization and flag values
     public Inkle(String fileName) {
 
         FileReader reader = loadFile(fileName);
@@ -74,6 +75,18 @@ public class Inkle {
         }
     }
 
+    //TODO: Parse all text to handle flag values etc.
+    public void inkleOut(String output) {
+
+        while (output.contains("{~")) {
+            String piece = StringUtils.substringBetween(output, "{~", "}");
+            String[] strArray = piece.split("\\|");
+            output = output.replace("{~" + piece + "}", strArray[RandomUtils.nextInt(0, strArray.length)]);
+        }
+
+        System.out.println(output);
+    }
+
     //The following are acceptable markers:
     //str  ||  str = int  ||  str + int  ||  str - int
     //TODO: add advanced syntax for other arithmetic
@@ -81,7 +94,6 @@ public class Inkle {
 
         for (int i = this.currentContent.size() - 1; i > 0; i--) {
             HashMap<?, ?> obj = (HashMap<?, ?>) this.currentContent.get(i);
-            System.out.println("obj.toString() = " + obj.toString());
             if (obj.get("flagName") != null) {
 
                 String str = (String) obj.get("flagName");
@@ -111,7 +123,6 @@ public class Inkle {
                 this.flags.put(key, value);
             }
         }
-        System.out.println("this.flags.toString() = " + this.flags.toString());
     }
 
     public int getFlagValue(String key) {
@@ -132,7 +143,7 @@ public class Inkle {
 
         for (Option option : getOptions()) {
             if (checkOption(option)) {
-                System.out.println(num + ": " + option.getOption());
+                inkleOut(num + ": " + option.getOption());
                 this.options.add(option);
                 num++;
             }
@@ -196,8 +207,6 @@ public class Inkle {
             HashMap<?, ?> obj = (HashMap<?, ?>) this.currentContent.get(i);
 
             if (obj.get("option") != null) {
-                System.out.println("obj.get(\"ifConditions\") = " + obj.get("ifConditions"));
-
                 options.add(new Option(
                         obj.get("option").toString(),
                         obj.get("linkPath").toString(),
@@ -224,7 +233,7 @@ public class Inkle {
         String paragraph = (String) this.currentContent.get(0);
 
         if (checkParagraphConditions()) {
-            System.out.println(paragraph);
+            inkleOut(paragraph);
         }
 
         return getDivert();

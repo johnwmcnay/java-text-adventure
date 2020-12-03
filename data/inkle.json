@@ -15,7 +15,7 @@
       },
       "thereWasASecondP": {
         "content": [
-          "There was a second paragraph {~clear|cloudy|dark|very far away}",
+          "There was a second paragraph {~clear|cloudy|dark|very far away} {~and again|very near}",
           {
             "option": "Option 1",
             "linkPath": "youChoseOptionJu",
@@ -93,7 +93,7 @@
             "ifCondition": "option1"
           },
           {
-            "ifCondition": "test < 4"
+            "ifCondition": "test = 5"
           },
           {
             "notIfCondition": "option2"

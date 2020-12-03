@@ -71,9 +71,6 @@
             "divert": "blahBlahBlah"
           },
           {
-            "flagName": "test - 1"
-          },
-          {
             "pageNum": 2
           }
         ]
@@ -93,10 +90,10 @@
             "divert": "blahBlahBlah1"
           },
           {
-            "ifCondition": "test = 5"
+            "ifCondition": "option1"
           },
           {
-            "ifCondition": "option1"
+            "ifCondition": "test < 4"
           },
           {
             "notIfCondition": "option2"

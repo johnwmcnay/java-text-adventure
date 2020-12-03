@@ -12,7 +12,7 @@ public class Inkle {
     private HashMap<String, String> flags = new HashMap<>();
     private final String title;
     private final String initial;
-    private HashMap<?, ?> map = new HashMap<>();
+    private HashMap<?, ?> map;
     private final HashMap<?, ?> data;
     private final HashMap<?, ?> stitches;
     private List<?> currentContent;
@@ -246,34 +246,108 @@ public class Inkle {
                     return false;
                 }
             }
-
         }
         return true;
     }
 
-    //TODO: handle inequalities
+    //TODO: HEAVILY refactor checkIfNot and checkIf functions
     public boolean checkIfNotCondition(HashMap<?, ?> condition) {
 
         String str = (String) condition.get("notIfCondition");
-        String[] strArray = str.split("=");
+        String[] strArray;
+        boolean gt = false, lt = false, eq = false;
+        boolean a = false, b = false, c = false;
+
+        if (str.contains(">")) {
+            if (str.contains("=")) {
+                strArray = str.split(">=");
+                eq = true;
+            } else {
+                strArray = str.split(">");
+            }
+            gt = true;
+
+        } else if (str.contains("<")) {
+            if (str.contains("=")) {
+                strArray = str.split("<=");
+                eq = true;
+            } else {
+                strArray = str.split("<");
+            }
+            lt = true;
+        } else {
+            strArray = str.split("=");
+            eq = true;
+        }
+
         String key = strArray[0].trim();
         String value = strArray.length > 1 ? strArray[1].trim() : null;
 
-        return !this.flags.containsKey(key) || !this.flags.get(key).equals(value);
+        if (this.flags.get(key) == null || value == null){
+            return !this.flags.containsKey(key);
+        } else {
+
+            if (gt) {
+                a = !(Integer.parseInt(this.flags.get(key)) > Integer.parseInt(value));
+            }
+            if (lt) {
+                b = !(Integer.parseInt(this.flags.get(key)) < Integer.parseInt(value));
+            }
+            if (eq) {
+                c = !(Integer.parseInt(this.flags.get(key)) == Integer.parseInt(value));
+            }
+
+            return a || b || c;
+        }
     }
 
-    //TODO: handle inequalities
     public boolean checkIfCondition(HashMap<?, ?> condition) {
 
         String str = (String) condition.get("ifCondition");
-        String[] strArray = str.split("=");
+        String[] strArray;
+        boolean gt = false, lt = false, eq = false;
+        boolean a = false, b = false, c = false;
+
+        if (str.contains(">")) {
+            if (str.contains("=")) {
+                strArray = str.split(">=");
+                eq = true;
+            } else {
+                strArray = str.split(">");
+            }
+            gt = true;
+
+        } else if (str.contains("<")) {
+            if (str.contains("=")) {
+                strArray = str.split("<=");
+                eq = true;
+            } else {
+                strArray = str.split("<");
+            }
+            lt = true;
+        } else {
+            strArray = str.split("=");
+            eq = true;
+        }
+
         String key = strArray[0].trim();
         String value = strArray.length > 1 ? strArray[1].trim() : null;
+        
+        if (this.flags.get(key) == null || value == null) {
+            return this.flags.containsKey(key);
+        } else {
+            if (gt) {
+                a = (Integer.parseInt(this.flags.get(key)) > Integer.parseInt(value));
+            }
+            if (lt) {
+                b = (Integer.parseInt(this.flags.get(key)) < Integer.parseInt(value));
+            }
+            if (eq) {
+                c = (Integer.parseInt(this.flags.get(key)) == Integer.parseInt(value));
+            }
 
-        if (!this.flags.containsKey(key)) {
-            return false;
+            return a || b || c;
         }
-        return value == null || this.flags.get(key).equals(value);
     }
 
     public List<?> getContent() {
